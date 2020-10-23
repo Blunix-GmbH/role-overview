@@ -1,0 +1,6 @@
+- name: create an overview.md in the root of this playbook
+  template:
+    src: templates/overview.md.j2
+    dest: "{{ overview_playbook_dir }}/overview.md"
+  delegate_to: localhost 
+  when: inventory_hostname == play_hosts[0]

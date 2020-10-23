@@ -1,0 +1,11 @@
+- name: Converge
+  # File is templated on local workstation
+  hosts: all
+  roles:
+    - role: role-overview
+
+  # This setting is only required in molecule. it describes the path on the workstation where the overview.md file will be generated.
+  # It is relative to where the playbook is located, in this case molecule/default/playbook.yml. Target is root of this repository.
+  vars:
+    overview_playbook_dir: "../.."
+

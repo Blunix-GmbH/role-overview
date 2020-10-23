@@ -1,0 +1,86 @@
+dependency:
+  name: galaxy
+
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+
+lint:
+  name: yamllint
+  options:
+    config-data:
+      line-length: disable
+
+platforms:
+  - name: debian1
+    box: debian/testing64
+  - name: debian2
+    box: debian/testing64
+  - name: debian3
+    box: debian/testing64
+
+provisioner:
+  name: ansible
+  connection_options:
+    ansible_become: yes
+  lint:
+    name: ansible-lint
+    options:
+      x:
+        - ANSIBLE0002
+
+  # mockup playbook-infrastructure variables for molecule
+  inventory:
+
+    group_vars:
+      all:
+        ansible_python_interpreter: "/usr/bin/python3"
+        company_internal_domain: exa.pm
+        ssh_users:
+          - name: max
+          - name: theo
+        letsencrypt_domain_names:
+          - "{{ inventory_hostname }}"
+
+    host_vars:
+      debian1:
+        nic_pub_ip: 1.2.3.4
+        tinc_ip: 127.16.0.123
+        tinc_aliases:
+          - example.exa.pm
+          - example.exa.pub
+          - example.com
+          - www.example.com
+        letsencrypt_domain_names:
+          - example.com
+          - www.example.com
+      debian2:
+        nic_pub_ip: 1.2.3.5
+        tinc_ip: 127.16.0.124
+        tinc_aliases:
+          - monitoring.exa.pm
+      debian3:
+        nic_pub_ip: 1.2.3.6
+        tinc_ip: 127.16.0.125
+        tinc_aliases:
+          - backup.exa.pm
+
+
+  config_options:
+    defaults:
+      ansible_managed: "This file is managed by Ansible, edit it in git!"
+      stdout_callback: yaml
+      retry_files_enabled: False
+    diff:
+      always: True
+
+scenario:
+  name: default
+
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
+    options:
+      ignore: 'E501'
